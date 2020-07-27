@@ -6,14 +6,21 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2020 | 不继的博客</title>
+  <title>深入理解AQS | 不继的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="不继的博客">
-<meta property="og:url" content="http://yoursite.com/archives/2020/index.html">
+  <meta name="description" content="锁核心类AQS什么是AQS？AQS是AbstractQueuedSynchronzied类，它是一个用来构建锁和同步器的框架。使用AQS能够简单高效的构造出大量的同步器，实际上JUC中的锁和同步器都是通过AQS构建的。采用的是模板方法模式。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解AQS">
+<meta property="og:url" content="http://yoursite.com/2020/07/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3AQS/index.html">
 <meta property="og:site_name" content="不继的博客">
+<meta property="og:description" content="锁核心类AQS什么是AQS？AQS是AbstractQueuedSynchronzied类，它是一个用来构建锁和同步器的框架。使用AQS能够简单高效的构造出大量的同步器，实际上JUC中的锁和同步器都是通过AQS构建的。采用的是模板方法模式。">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-07-25T14:06:52.000Z">
+<meta property="article:modified_time" content="2020-07-25T14:09:20.174Z">
 <meta property="article:author" content="不继">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="多线程">
+<meta property="article:tag" content="JUC">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="不继的博客" type="application/atom+xml">
@@ -138,36 +145,104 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-深入理解AQS" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      深入理解AQS
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/25/JUC%E7%9A%84%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8/" class="archive-article-date">
+
+        
+        <a href="/2020/07/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3AQS/" class="archive-article-date">
   	<time datetime="2020-07-25T14:06:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-25</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/25/JUC%E7%9A%84%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8/">深入理解AQS</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="锁核心类AQS"><a href="#锁核心类AQS" class="headerlink" title="锁核心类AQS"></a>锁核心类AQS</h2><h3 id="什么是AQS？"><a href="#什么是AQS？" class="headerlink" title="什么是AQS？"></a>什么是AQS？</h3><p>AQS是AbstractQueuedSynchronzied类，它是一个用来构建锁和同步器的框架。使用AQS能够简单高效的构造出大量的同步器，实际上JUC中的锁和同步器都是通过AQS构建的。采用的是模板方法模式。</p>
+<a id="more"></a>
 
-        <div class="article-info info-on-right">
-          
+<h3 id="AQS的核心思想是什么？"><a href="#AQS的核心思想是什么？" class="headerlink" title="AQS的核心思想是什么？"></a>AQS的核心思想是什么？</h3><p>AQS的核心思想是：如果当前被请求的资源空闲，如果有线程来申请，那么该线程就直接占有该资源，将请求资源的线程设置为工作线程，被占有的资源设置为锁定状态，具体表现是state变量设置为1。如果请求的资源被占用，则当前线程会加入到一个CLH队列中，将暂时获取不到资源的线程加入队列中。</p>
+<h4 id="CLH队列"><a href="#CLH队列" class="headerlink" title="CLH队列"></a>CLH队列</h4><p>CLH队列就是一个虚拟的双向队列，AQS将每条请求共享资源的线程封装成一个CLH锁队列的一个结点来实现锁的分配。</p>
+<p>AQS中线程以双向队列作为队列的形式被存储，每个Node结点中都有一个内部变量Thread，保存线程。</p>
+<p>每个线程要得到这把锁，要等待都要进入这个队列中。</p>
+<p>AQS的默认实现是非公平锁，所以每个线程进入都要直接抢一下锁，如果锁已经被占有抢不到了，就要在队列中排队等待。</p>
+<p> 抢的时候会先获取s  tate的值，如果state=0，就说明没有上锁，可以抢占，然后就通过CAS的方式进行抢占，以期望值为0，希望改为1，对state进行改动。</p>
+<h4 id="state"><a href="#state" class="headerlink" title="state"></a>state</h4><p>state是一个被volatile修饰的一个数字，它具体的含义是由各个继承的子类决定的，子类不同的实现有不同的意义。</p>
+<p>state被volatile修饰，保证各个线程之间可见。</p>
+<p>比如可重入锁里，state为1就代表着加锁，state为0就代表解锁了，如果重复加锁 state的值就+1。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> state;<span class="comment">//共享变量，使用volatile修饰保证线程可见性</span></span><br></pre></td></tr></table></figure>
+
+<p>state信息的操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//返回同步状态的当前值</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">getState</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">return</span> state;</span><br><span class="line">&#125;</span><br><span class="line"> <span class="comment">// 设置同步状态的值</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">setState</span><span class="params">(<span class="keyword">int</span> newState)</span> </span>&#123; </span><br><span class="line">        state = newState;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//原子地(CAS操作)将同步状态值设置为给定值update如果当前同步状态的值等于expect(期望值)</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">compareAndSetState</span><span class="params">(<span class="keyword">int</span> expect, <span class="keyword">int</span> update)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> unsafe.compareAndSwapInt(<span class="keyword">this</span>, stateOffset, expect, update);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要额外注意的是这个CAS操作，当线程抢占资源的时候就是用的CAS操作。</p>
+<h3 id="AQS对资源的共享方式"><a href="#AQS对资源的共享方式" class="headerlink" title="AQS对资源的共享方式"></a>AQS对资源的共享方式</h3><p>AQS设置了两种资源共享方式</p>
+<ul>
+<li>独占：只有一个线程能执行，如ReentrantLock。又分为公平锁和非公平锁。<ul>
+<li>公平锁：按照线程在队列中的排队顺序，先到者先拿到锁</li>
+<li>非公平锁：当线程要获取锁时，无视队列顺序直接去抢锁，谁抢到就是谁的</li>
+</ul>
+</li>
+<li>共享：多个线程可同时执行，如Semaphore、CountDownLatch等等。</li>
+</ul>
+<p>ReentrantReadWriteLock 可以看成是组合式，因为ReentrantReadWriteLock也就是读写锁允许多个线程同时对某一资源进行读。</p>
+<p>不同自定义同步器争用共享资源的方式不同，所以实现的时候需要实现共享资源state的获取与释放，至于线程等待队列的具体维护AQS已经帮我们实现好了，所以不需要在自定义类实现。</p>
+<h3 id="AQS的设计模式"><a href="#AQS的设计模式" class="headerlink" title="AQS的设计模式"></a>AQS的设计模式</h3><p>AQS使用了模板方法的设计模式。</p>
+<h4 id="模板方法设计模式"><a href="#模板方法设计模式" class="headerlink" title="模板方法设计模式"></a>模板方法设计模式</h4><p>模板方法设计模式能够定义算法框架，但是里面具体的步骤可以延迟到子类去实现。</p>
+<p>通过模板方法，子类可以自定义某些步骤的实现，而不需要改变算法结构。</p>
+<p>举一个生活中的例子就是泡咖啡和泡茶。</p>
+<p>其实这两个动作的大致框架是一样的，有很多相同的步骤。不过有些步骤里面的具体行为不一样，就可以套用模板方法的设计模式，</p>
+<h4 id="AQS的运用"><a href="#AQS的运用" class="headerlink" title="AQS的运用"></a>AQS的运用</h4><p>AQS如果要自定义同步器，只需要重写这几个模板方法即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">isHeldExclusively()<span class="comment">//该线程是否正在独占资源。只有用到condition才需要去实现它。</span></span><br><span class="line">tryAcquire(<span class="keyword">int</span>)<span class="comment">//独占方式。尝试获取资源，成功则返回true，失败则返回false。</span></span><br><span class="line">tryRelease(<span class="keyword">int</span>)<span class="comment">//独占方式。尝试释放资源，成功则返回true，失败则返回false。</span></span><br><span class="line">tryAcquireShared(<span class="keyword">int</span>)<span class="comment">//共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。</span></span><br><span class="line">tryReleaseShared(<span class="keyword">int</span>)<span class="comment">//共享方式。尝试释放资源，成功则返回true，失败则返回false。</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="AQS源码分析"><a href="#AQS源码分析" class="headerlink" title="AQS源码分析"></a>AQS源码分析</h3>
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>c<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/img/alibaba.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/img/weixin.jpg">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -187,427 +262,128 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/07/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3AQS/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3AQS/" class="archive-article-date">
-  	<time datetime="2020-07-25T14:06:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-25</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2020/07/25/JUC%E7%9A%84%E9%94%81%E5%92%8C%E5%90%8C%E6%AD%A5%E5%99%A8/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          深入理解AQS
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/07/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3ThreadLocal%E7%B1%BB/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">深入理解ThreadLocal类</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3AQS/">深入理解AQS</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JUC</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#锁核心类AQS"><span class="toc-number">1.</span> <span class="toc-text">锁核心类AQS</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是AQS？"><span class="toc-number">1.1.</span> <span class="toc-text">什么是AQS？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AQS的核心思想是什么？"><span class="toc-number">1.2.</span> <span class="toc-text">AQS的核心思想是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#CLH队列"><span class="toc-number">1.2.1.</span> <span class="toc-text">CLH队列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#state"><span class="toc-number">1.2.2.</span> <span class="toc-text">state</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AQS对资源的共享方式"><span class="toc-number">1.3.</span> <span class="toc-text">AQS对资源的共享方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AQS的设计模式"><span class="toc-number">1.4.</span> <span class="toc-text">AQS的设计模式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#模板方法设计模式"><span class="toc-number">1.4.1.</span> <span class="toc-text">模板方法设计模式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AQS的运用"><span class="toc-number">1.4.2.</span> <span class="toc-text">AQS的运用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AQS源码分析"><span class="toc-number">1.5.</span> <span class="toc-text">AQS源码分析</span></a></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3ThreadLocal%E7%B1%BB/" class="archive-article-date">
-  	<time datetime="2020-07-25T14:05:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-25</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/25/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3ThreadLocal%E7%B1%BB/">深入理解ThreadLocal类</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JUC</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/25/%E6%AF%8F%E6%97%A5%E4%B8%80%E5%88%B7%20lintcode%20127.%20%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F/" class="archive-article-date">
-  	<time datetime="2020-07-25T11:26:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-25</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/25/%E6%AF%8F%E6%97%A5%E4%B8%80%E5%88%B7%20lintcode%20127.%20%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F/">每日一刷 lintcode 127. 拓扑排序</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">BFS</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">图</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">拓扑排序</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/算法//" class="article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
+        
+    </div>
+</aside>
 
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/23/final%E5%85%B3%E9%94%AE%E5%AD%97/" class="archive-article-date">
-  	<time datetime="2020-07-23T14:57:15.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/23/final%E5%85%B3%E9%94%AE%E5%AD%97/">final关键字</a>
-    </h1>
-  
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">关键字</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/23/sychronized%E5%85%B3%E9%94%AE%E5%AD%97/" class="archive-article-date">
-  	<time datetime="2020-07-23T14:40:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/23/sychronized%E5%85%B3%E9%94%AE%E5%AD%97/">synchronized关键字</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">关键字</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/21/2020-07-21-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="archive-article-date">
-  	<time datetime="2020-07-21T12:24:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-21</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/21/2020-07-21-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">2020-07-21-学习笔记</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">记录</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/学习日记//" class="article-tag-list-link color5">学习日记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/21/%E6%AF%8F%E6%97%A5%E4%B8%80%E5%88%B7%20%E5%85%8B%E9%9A%86%E5%9B%BE/" class="archive-article-date">
-  	<time datetime="2020-07-21T12:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-21</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/21/%E6%AF%8F%E6%97%A5%E4%B8%80%E5%88%B7%20%E5%85%8B%E9%9A%86%E5%9B%BE/">每日一刷 克隆图</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">BFS</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">图</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/算法//" class="article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/20/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/" class="archive-article-date">
-  	<time datetime="2020-07-20T01:49:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-20</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/20/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/">算法学习</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">BFS</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">图</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/算法//" class="article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
   
-    </div></section>
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -630,8 +406,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
