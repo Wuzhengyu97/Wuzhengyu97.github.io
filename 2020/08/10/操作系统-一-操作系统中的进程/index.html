@@ -6,15 +6,24 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 动态规划 | 不继的博客</title>
+  <title>操作系统(一) 操作系统中的进程 | 不继的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="不继的博客">
-<meta property="og:url" content="http://yoursite.com/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/index.html">
+  <meta name="description" content="进程的产生与组成多进程的带来的问题在计算机发展的早期还是单道处理系统，这个时候对于操作系统而言进程的管理是很简单的，因为只会运行一个程序，所以所有的资源都是这个进程的，也不需要什么特别的管理。 但是后来随着多道批处理系统的出现，可以同时运行多个进程了，这个时候操作系统就需要对进程进行一些管理以帮助进程能够正常工作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统(一) 操作系统中的进程">
+<meta property="og:url" content="http://yoursite.com/2020/08/10/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E4%B8%80-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B/index.html">
 <meta property="og:site_name" content="不继的博客">
+<meta property="og:description" content="进程的产生与组成多进程的带来的问题在计算机发展的早期还是单道处理系统，这个时候对于操作系统而言进程的管理是很简单的，因为只会运行一个程序，所以所有的资源都是这个进程的，也不需要什么特别的管理。 但是后来随着多道批处理系统的出现，可以同时运行多个进程了，这个时候操作系统就需要对进程进行一些管理以帮助进程能够正常工作。">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wuzhengyu97/myImage/master/img/image-20200810165833544.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Wuzhengyu97/myImage/master/img/image-20200810175249677.png">
+<meta property="article:published_time" content="2020-08-10T09:59:54.000Z">
+<meta property="article:modified_time" content="2020-08-10T10:01:24.474Z">
 <meta property="article:author" content="不继">
+<meta property="article:tag" content="理论基础">
+<meta property="article:tag" content="操作系统">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Wuzhengyu97/myImage/master/img/image-20200810165833544.png">
   
     <link rel="alternative" href="/atom.xml" title="不继的博客" type="application/atom+xml">
   
@@ -138,114 +147,259 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-操作系统-一-操作系统中的进程" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/08/10/%E5%89%91%E6%8C%87offer-10-II-%E9%9D%92%E8%9B%99%E8%B7%B3%E5%8F%B0%E9%98%B6%E9%97%AE%E9%A2%98/" class="archive-article-date">
-  	<time datetime="2020-08-10T02:54:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-10</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/08/10/%E5%89%91%E6%8C%87offer-10-II-%E9%9D%92%E8%9B%99%E8%B7%B3%E5%8F%B0%E9%98%B6%E9%97%AE%E9%A2%98/">剑指offer-10-II. 青蛙跳台阶问题</a>
+    <h1 class="article-title" itemprop="name">
+      操作系统(一) 操作系统中的进程
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/08/10/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E4%B8%80-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B/" class="archive-article-date">
+  	<time datetime="2020-08-10T09:59:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-10</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="进程的产生与组成"><a href="#进程的产生与组成" class="headerlink" title="进程的产生与组成"></a>进程的产生与组成</h3><h4 id="多进程的带来的问题"><a href="#多进程的带来的问题" class="headerlink" title="多进程的带来的问题"></a>多进程的带来的问题</h4><p>在计算机发展的早期还是单道处理系统，这个时候对于操作系统而言进程的管理是很简单的，因为只会运行一个程序，所以所有的资源都是这个进程的，也不需要什么特别的管理。</p>
+<p>但是后来随着多道批处理系统的出现，可以同时运行多个进程了，这个时候操作系统就需要对进程进行一些管理以帮助进程能够正常工作。</p>
+<a id="more"></a>
+
+<p>因为多进程会出现这样的问题：</p>
+<ul>
+<li>系统资源谁用？什么时候用？</li>
+<li>系统的数据放在哪里？</li>
+<li>什么时候轮到这个进程运行？</li>
+<li>……</li>
+</ul>
+<p>进程的定义也就发生了改变。</p>
+<h4 id="进程的组成"><a href="#进程的组成" class="headerlink" title="进程的组成"></a>进程的组成</h4><p>针对这些个问题，操作系统做出了一系列的管理措施，其中一项就是使用PCB来保存进程信息。</p>
+<p>PCB即进程管理块，它负责的是管理进程信息。</p>
+<p>PCB中管理的信息包括了：</p>
+<ul>
+<li>进程的描述信息（比如进程PID，UID）</li>
+<li>进程的管理信息</li>
+<li>进程的资源信息</li>
+<li>处理机相关数据信息，为上下文切换提供服务。</li>
+</ul>
+<p>总而言之，PCB中存放着进程中相关的信息。</p>
+<h4 id="进程实体"><a href="#进程实体" class="headerlink" title="进程实体"></a>进程实体</h4><p>程序段、数据段、PCB三部分组成了进程实体，在这三者中，PCB的概念是重中之重。</p>
+<h4 id="进程的组织方式"><a href="#进程的组织方式" class="headerlink" title="进程的组织方式"></a>进程的组织方式</h4><p>有了进程实体，就代表进程可以被管理起来了，但是管理进程也要将其以一定的方式组织起来，这样才能有条不紊的去调用程序，这种方式就是进程的组织方式。</p>
+<p>组织方式分为两种，一种是链接方式，一种是索引方式。</p>
+<p>链接方式其实就是将要管理的进程们分为多个队列，操作系统持有各个队列的指针。</p>
+<p>索引方式其实就是将要管理的进程们分几个索引表存放，操纵系统持有各个索引表的指针。</p>
+<h4 id="进程的特征"><a href="#进程的特征" class="headerlink" title="进程的特征"></a>进程的特征</h4><p>进程的特征有：动态性、并发性、独立性、异步性、结构性。</p>
+<p>动态性：进程是程序的依次执行过程，因此进程是动态的。</p>
+<p>并发性：多个进程实体可以同时执行，所以进程是可并发的。</p>
+<p>独立性：进程是操作系统分配资源的独立单位，所以各个进程之间的资源是独立的</p>
+<p>异步性：进程内部的执行顺序互不相关。</p>
+<p>结构性：从进程内部来看，进程是由PCB、程序段、数据段组成。每个进程都有一个PCB。</p>
+<h4 id="进程的状态"><a href="#进程的状态" class="headerlink" title="进程的状态"></a>进程的状态</h4><p>进程是程序的一次运行过程，既然是运行过程就会有创建、运行、消亡的概念，不同的进程也就有了不同的状态。</p>
+<p>而在运行的过程中，由于CPU不可能同时运行所有的进程，所以总会有进程在等待CPU来运行它，就有了就绪态和运行态之分。而又因为有的进程需要等待一些资源，又有了一个阻塞态。</p>
+<p><img src="https://raw.githubusercontent.com/Wuzhengyu97/myImage/master/img/image-20200810165833544.png" alt="image-20200810165833544"></p>
+<h4 id="进程的控制"><a href="#进程的控制" class="headerlink" title="进程的控制"></a>进程的控制</h4><p>进程既然有了实体并且被组织起来了，还有了进程状态，这样就可以对其进行一些控制了。</p>
+<p>其实进程的控制归根结底就是进程不同状态的转换。</p>
+<p>这些转换也一定是具有原子性，这样才能确保进程的正常运行。</p>
+<p>而这些状态的转换最重要的还是在于PCB与CPU之间。</p>
+<p>再想想为什么要有PCB这个东西呢？它其实就是用来保存进程信息的，在多进程的CPU下，很少会有一个进程在CPU运行的时间片内就运行结束的情况，而运行不同的程序，CPU中的数据也不会相同，这个时候PCB就派上用场了，它可以进行在进程切换的时候保存或者恢复现场。</p>
+<p>当进程从运行态要切换为就绪态或者阻塞态的时候，PCB可以保存当前的CPU信息。</p>
+<p>等到进程再次变为运行态，就可以通过PCB来恢复之前运行的信息，接着上次的执行结果继续执行了。</p>
+<h4 id="进程通信"><a href="#进程通信" class="headerlink" title="进程通信"></a>进程通信</h4><p>进程之间是相互隔离的，具有独立性，但是进程间的通信又是必不可少的一个需求，比如图片系统的图片想要通过QQ发送出去，就需要利用到进程间通信。</p>
+<p>那么进程间通信应该如何实现呢？</p>
+<p>目前有三种通信方式。</p>
+<ul>
+<li>管道通信<ul>
+<li>管道通信就是让一块区域作为管道，一个进程往里面写，一个进程往外读。管道是半双工的，即同一时刻只能有一个进程写。</li>
+</ul>
+</li>
+<li>共享存储<ul>
+<li>共享存储就是设置一个共享空间，然后要两个进程要互斥的访问这个共享空间。</li>
+</ul>
+</li>
+<li>消息传递<ul>
+<li>传递结构化的信息，系统提供发送和接收原语。被发送出去的消息会在接收方的消息队列或者消息中间体中等待获取。</li>
+</ul>
+</li>
+</ul>
+<h4 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h4><h5 id="什么是线程？"><a href="#什么是线程？" class="headerlink" title="什么是线程？"></a>什么是线程？</h5><p>线程是轻量级的进程，它其实是把进程再次分化后的结果。</p>
+<p>有了多进程后，我们一个电脑可以同时处理多个事情，但是一个线程还是只能串行的执行程序，从头到尾做一件事情，可是有时候就有些需求要求一个进程同时做多个事情，比如写文章的时候的自动保存功能，这就提出了线程的需求。</p>
+<p>一个进程中可以有多个线程，每个线程可以并发的执行不同的事情，来使得进程更加灵活，线程是CPU的最小执行单元，也是程序执行流的最小单位。</p>
+<p>有了线程后，进程只作为除CPU之外的系统资源的分配单元。</p>
+<p>有了多线程之后，又有了新的变化。</p>
+<p><img src="https://raw.githubusercontent.com/Wuzhengyu97/myImage/master/img/image-20200810175249677.png" alt="image-20200810175249677"></p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>c<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/img/alibaba.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/img/weixin.jpg">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">理论基础</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">剑指offer</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/08/10/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F-%E4%B8%80-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/08/10/%E5%89%91%E6%8C%87offer-10-I.%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E6%95%B0%E5%88%97/" class="archive-article-date">
-  	<time datetime="2020-08-10T02:34:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-10</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/08/10/%E5%89%91%E6%8C%87-Offer-11-%E6%97%8B%E8%BD%AC%E6%95%B0%E7%BB%84%E7%9A%84%E6%9C%80%E5%B0%8F%E6%95%B0%E5%AD%97/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">剑指 offer 11. 旋转数组的最小数字</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/08/10/%E5%89%91%E6%8C%87offer-10-I.%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E6%95%B0%E5%88%97/">剑指offer-10-I.斐波那契数列</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">剑指offer</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#进程的产生与组成"><span class="toc-number">1.</span> <span class="toc-text">进程的产生与组成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#多进程的带来的问题"><span class="toc-number">1.1.</span> <span class="toc-text">多进程的带来的问题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#进程的组成"><span class="toc-number">1.2.</span> <span class="toc-text">进程的组成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#进程实体"><span class="toc-number">1.3.</span> <span class="toc-text">进程实体</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#进程的组织方式"><span class="toc-number">1.4.</span> <span class="toc-text">进程的组织方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#进程的特征"><span class="toc-number">1.5.</span> <span class="toc-text">进程的特征</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#进程的状态"><span class="toc-number">1.6.</span> <span class="toc-text">进程的状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#进程的控制"><span class="toc-number">1.7.</span> <span class="toc-text">进程的控制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#进程通信"><span class="toc-number">1.8.</span> <span class="toc-text">进程通信</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#线程"><span class="toc-number">1.9.</span> <span class="toc-text">线程</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#什么是线程？"><span class="toc-number">1.9.1.</span> <span class="toc-text">什么是线程？</span></a></li></ol></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
   
-    </div></section>
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -268,9 +422,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
